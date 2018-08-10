@@ -1,2 +1,3 @@
 # AeroGlassLibrary
-This is a C++ library of aero ground glass effect for MFC and ATL Applications
+适用于win7以上操作系统的Aero毛玻璃效果库,可以用于MFC/ATL程序的界面美化
+使用时,请调用common/aerosubc.h下的AllAero函数
