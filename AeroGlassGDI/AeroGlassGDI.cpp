@@ -29,19 +29,33 @@ CAeroGlassGDIApp theApp;
 
 // CAeroGlassGDIApp ³õÊ¼»¯
 
+BOOL GetNtVersionNumbers(DWORD &dwMajorVer, DWORD & dwMinorVer, DWORD & dwBuildNumber) {
+
+	BOOL bRet = FALSE;
+
+	HMODULE hModNtdll = NULL;
+
+	if (hModNtdll = ::LoadLibraryW(L"ntdll.dll")) {
+		typedef void (WINAPI *pfRTLGETNTVERSIONNUMBERS)(DWORD*, DWORD*, DWORD*);
+		pfRTLGETNTVERSIONNUMBERS pfRtlGetNtVersionNumbers;
+		pfRtlGetNtVersionNumbers = (pfRTLGETNTVERSIONNUMBERS)::GetProcAddress(hModNtdll, "RtlGetNtVersionNumbers");
+		if (pfRtlGetNtVersionNumbers) {
+			pfRtlGetNtVersionNumbers(&dwMajorVer, &dwMinorVer, &dwBuildNumber);
+			dwBuildNumber &= 0x0ffff;
+			bRet = TRUE;
+		}
+		::FreeLibrary(hModNtdll);
+		hModNtdll = NULL;
+	}
+	return bRet;
+}
+
 BOOL isValidSystem() {
-    int a = 0, b = 0, i = 0, j = 0;
-    _asm {
-        pushad
-        mov ebx, fs:[0x18] // get self pointer from TEB
-        mov eax, fs:[0x30] // get pointer to PEB / database
-        mov ebx, [eax+0A8h] // get OSMinorVersion
-        mov eax, [eax+0A4h] // get OSMajorVersion
-        mov j, ebx
-        mov i, eax
-        popad
-    }
-    return (i>=6);
+	DWORD a, b, c;
+	if (GetNtVersionNumbers(a, b, c)) {
+		if (a >= 6 && b >= 0) return TRUE;
+	}
+	return FALSE;
 }
 
 BOOL CAeroGlassGDIApp::InitInstance() {
